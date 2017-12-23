@@ -1,0 +1,60 @@
+group 'net.andreho'
+version projectVersion
+
+buildscript {
+  repositories {
+    mavenCentral()
+    maven { url "https://plugins.gradle.org/m2" }
+  }
+  dependencies {
+    classpath "org.junit.platform:junit-platform-gradle-plugin:$junitPlatformGradlePluginVersion"
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+defaultTasks 'clean', 'build', 'test', 'install', 'publishToMavenLocal'
+
+sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  testCompile "org.junit.platform:junit-platform-launcher:$junitPlatformLauncherVersion"
+
+  testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+  testCompile "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+  testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+  testCompile "org.assertj:assertj-core:$assertjVersion"
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact sourceJar {
+        classifier "sources"
+      }
+    }
+  }
+}
+
+junitPlatform {
+  // enableStandardTestTask true
+  // selectors (optional)
+  // filters (optional)
+}
